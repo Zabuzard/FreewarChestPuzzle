@@ -134,6 +134,7 @@ function addRotationListener(link, npcId, rotation) {
 
         chestNpc.position = ((position + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions;
         chestNpc.previousPosition = previousPosition;
+        chestNpc.lastRotation = rotation;
 
         if (nextDepth !== null && nextDepth !== depth) {
             chestNpc.position = 0;
@@ -156,7 +157,7 @@ function addRotationListeners(npcRow, npcId) {
     }
 }
 
-function createPuzzleClock(positions, position, previousPosition, results, depth) {
+function createPuzzleClock(positions, position, previousPosition, results, depth, lastRotation) {
     var size = 192;
     var center = size / 2;
     var radius = 74;
@@ -223,7 +224,14 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
 
         var clockwise = ((to - from + positions) % positions);
         var counterClockwise = positions - clockwise;
-        var direction = clockwise <= counterClockwise ? 1 : -1;
+        var direction;
+
+        if (clockwise === counterClockwise && lastRotation) {
+            direction = lastRotation > 0 ? 1 : -1;
+        } else {
+            direction = clockwise <= counterClockwise ? 1 : -1;
+        }
+
         var steps = direction === 1 ? clockwise : counterClockwise;
 
         if (steps === 0) { return; }
@@ -343,7 +351,7 @@ function createMoveFeedback(feedback) {
     return container;
 }
 
-function displayPuzzleState(npcRow, npcId, depth, positions, position, previousPosition, results) {
+function displayPuzzleState(npcRow, npcId, depth, positions, position, previousPosition, results, lastRotation) {
     if (npcRow.querySelector('.freewar-chest-puzzle-info')) { return; }
 
     var info = document.createElement('div');
@@ -392,7 +400,7 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     var feedbackContainer = clockContainer.lastChild;
 
     clockColumn.appendChild(depthLabel);
-    clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth));
+    clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth, lastRotation));
 
     clockContainer.insertBefore(clockColumn, feedbackContainer);
     clockContainer.style.position = 'relative';
@@ -441,6 +449,7 @@ function processChestNpcs() {
                 positions: positions,
                 position: 0,
                 previousPosition: 0,
+                lastRotation: 0,
                 results: {},
                 state: 'unknown',
                 lastSeen: now
@@ -470,6 +479,7 @@ function processChestNpcs() {
                 chestNpcs[npcId].depth = depth;
                 chestNpcs[npcId].position = 0;
                 chestNpcs[npcId].previousPosition = 0;
+                chestNpcs[npcId].lastRotation = 0;
                 changed = true;
             }
 
@@ -490,6 +500,11 @@ function processChestNpcs() {
                 changed = true;
             }
 
+            if (chestNpcs[npcId].lastRotation === undefined || chestNpcs[npcId].lastRotation === null) {
+                chestNpcs[npcId].lastRotation = 0;
+                changed = true;
+            }
+
             if (!chestNpcs[npcId].results) {
                 chestNpcs[npcId].results = {};
                 changed = true;
@@ -498,7 +513,7 @@ function processChestNpcs() {
 
         if (chestNpcs[npcId].positions !== null && chestNpcs[npcId].positions !== undefined) {
             addRotationListeners(npcRow, npcId);
-            displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position, chestNpcs[npcId].previousPosition, chestNpcs[npcId].results);
+            displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position, chestNpcs[npcId].previousPosition, chestNpcs[npcId].results, chestNpcs[npcId].lastRotation);
         }
     }
 
