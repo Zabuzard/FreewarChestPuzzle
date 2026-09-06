@@ -362,21 +362,21 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     info.style.backgroundColor = '#eee';
     info.style.color = '#000';
 
-    var text = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Previous Position: ' + previousPosition + ' | Position: ' + position;
+    // var text = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Previous Position: ' + previousPosition + ' | Position: ' + position;
 
-    if (results) {
-        var depths = Object.keys(results);
+    // if (results) {
+    //     var depths = Object.keys(results);
 
-        for (var i = 0; i < depths.length; i++) {
-            var resultDepth = depths[i];
-            var result = results[resultDepth];
+    //     for (var i = 0; i < depths.length; i++) {
+    //         var resultDepth = depths[i];
+    //         var result = results[resultDepth];
 
-            text += ' | Depth ' + resultDepth + ': Good [' + result.good.join(', ') + '] Bad [' + result.bad.join(', ') + ']';
-        }
-    }
+    //         text += ' | Depth ' + resultDepth + ': Good [' + result.good.join(', ') + '] Bad [' + result.bad.join(', ') + ']';
+    //     }
+    // }
 
-    info.textContent = text;
-    npcRow.appendChild(info);
+    // info.textContent = text;
+    // npcRow.appendChild(info);
 
     var clockContainer = document.createElement('div');
     clockContainer.style.display = 'flex';
