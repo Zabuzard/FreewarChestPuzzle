@@ -89,6 +89,18 @@ function getPositions(npcRow) {
     return maxRotation > 0 ? maxRotation * 2 : null;
 }
 
+function getMoveFeedback(npcRow) {
+    var text = npcRow.textContent;
+    var start = text.indexOf('Dabei hörst du');
+
+    if (start === -1) { return []; }
+
+    var feedbackText = text.substring(start);
+    var matches = feedbackText.match(/\b(Klick|Klack)\b/g);
+
+    return matches || [];
+}
+
 function addKnownPosition(chestNpc, depth, position, type) {
     if (!chestNpc.results) {
         chestNpc.results = {};
@@ -284,6 +296,31 @@ function createPuzzleClock(positions, position, previousPosition, results) {
     return svg;
 }
 
+function createMoveFeedback(feedback) {
+    var container = document.createElement('div');
+
+    container.style.display = 'flex';
+    container.style.alignItems = 'center';
+    container.style.gap = '0.4em';
+    container.style.marginTop = '0.5em';
+    container.style.marginLeft = '0.75em';
+
+    for (var i = 0; i < feedback.length; i++) {
+        var circle = document.createElement('div');
+
+        circle.style.width = '14px';
+        circle.style.height = '14px';
+        circle.style.borderRadius = '50%';
+        circle.style.backgroundColor = feedback[i] === 'Klick' ? '#6f9fc9' : '#b56f6f';
+        circle.style.border = '1px solid ' + (feedback[i] === 'Klick' ? '#4f789e' : '#8e4f4f');
+        circle.style.boxSizing = 'border-box';
+
+        container.appendChild(circle);
+    }
+
+    return container;
+}
+
 function displayPuzzleState(npcRow, npcId, depth, positions, position, previousPosition, results) {
     if (npcRow.querySelector('.freewar-chest-puzzle-info')) { return; }
 
@@ -313,7 +350,14 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     info.textContent = text;
     npcRow.appendChild(info);
 
-    npcRow.appendChild(createPuzzleClock(positions, position, previousPosition, results));
+    var clockContainer = document.createElement('div');
+    clockContainer.style.display = 'flex';
+    clockContainer.style.alignItems = 'center';
+
+    clockContainer.appendChild(createPuzzleClock(positions, position, previousPosition, results));
+    clockContainer.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
+
+    npcRow.appendChild(clockContainer);
 }
 
 function processChestNpcs() {
