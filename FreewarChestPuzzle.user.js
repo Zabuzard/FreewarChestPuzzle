@@ -122,11 +122,11 @@ function addRotationListener(link, npcId, rotation) {
             nextDepth = null;
         }
 
-        chestNpc.position = ((position - 1 + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions + 1;
+        chestNpc.position = ((position + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions;
         chestNpc.previousPosition = previousPosition;
 
         if (nextDepth !== null && nextDepth !== depth) {
-            chestNpc.position = 1;
+            chestNpc.position = 0;
         }
 
         saveChestNpcs(chestNpcs);
@@ -200,8 +200,8 @@ function processChestNpcs() {
                 id: npcId,
                 depth: depth,
                 positions: positions,
-                position: 1,
-                previousPosition: 1,
+                position: 0,
+                previousPosition: 0,
                 results: {},
                 state: 'unknown'
             };
@@ -209,8 +209,8 @@ function processChestNpcs() {
         } else {
             if (npcRow.textContent.indexOf('Du musst noch mal von vorn beginnen.') !== -1) {
                 addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
-                chestNpcs[npcId].position = 1;
-                chestNpcs[npcId].previousPosition = 1;
+                chestNpcs[npcId].position = 0;
+                chestNpcs[npcId].previousPosition = 0;
                 changed = true;
             }
 
@@ -222,8 +222,8 @@ function processChestNpcs() {
                 }
 
                 chestNpcs[npcId].depth = depth;
-                chestNpcs[npcId].position = 1;
-                chestNpcs[npcId].previousPosition = 1;
+                chestNpcs[npcId].position = 0;
+                chestNpcs[npcId].previousPosition = 0;
                 changed = true;
             }
 
@@ -232,13 +232,13 @@ function processChestNpcs() {
                 changed = true;
             }
 
-            if (!chestNpcs[npcId].position) {
-                chestNpcs[npcId].position = 1;
+            if (chestNpcs[npcId].position === undefined || chestNpcs[npcId].position === null) {
+                chestNpcs[npcId].position = 0;
                 changed = true;
             }
 
-            if (!chestNpcs[npcId].previousPosition) {
-                chestNpcs[npcId].previousPosition = 1;
+            if (chestNpcs[npcId].previousPosition === undefined || chestNpcs[npcId].previousPosition === null) {
+                chestNpcs[npcId].previousPosition = 0;
                 changed = true;
             }
 
