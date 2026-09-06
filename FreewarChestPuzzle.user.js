@@ -62,7 +62,10 @@ function isChestNpc(npcRow) {
 }
 
 function getDepth(npcRow) {
-    var match = npcRow.textContent.match(/\bTiefe\s+(\d+):/);
+    var matches = npcRow.textContent.match(/\bTiefe\s+(\d+):/g);
+    if (!matches || !matches.length) { return null; }
+
+    var match = matches[matches.length - 1].match(/\bTiefe\s+(\d+):/);
     return match ? parseInt(match[1], 10) : null;
 }
 
@@ -153,7 +156,7 @@ function addRotationListeners(npcRow, npcId) {
     }
 }
 
-function createPuzzleClock(positions, position, previousPosition, results) {
+function createPuzzleClock(positions, position, previousPosition, results, depth) {
     var size = 240;
     var center = size / 2;
     var radius = 92;
@@ -170,19 +173,9 @@ function createPuzzleClock(positions, position, previousPosition, results) {
     svg.style.border = '1px solid #444';
     svg.style.borderRadius = '50%';
 
-    var currentResult = results && results[position];
-    var goodPositions = results && results.good ? results.good : [];
-    var badPositions = results && results.bad ? results.bad : [];
-
-    if (results) {
-        var depthResults = results[Object.keys(results).find(function(key) {
-            return results[key] && results[key].good && results[key].bad;
-        })];
-        if (depthResults) {
-            goodPositions = depthResults.good || [];
-            badPositions = depthResults.bad || [];
-        }
-    }
+    var depthResults = results && results[depth];
+    var goodPositions = depthResults ? depthResults.good || [] : [];
+    var badPositions = depthResults ? depthResults.bad || [] : [];
 
     function getPoint(position, distance) {
         var angle = position / positions * Math.PI * 2 - Math.PI / 2;
@@ -348,7 +341,7 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     clockContainer.style.display = 'flex';
     clockContainer.style.alignItems = 'center';
 
-    clockContainer.appendChild(createPuzzleClock(positions, position, previousPosition, results));
+    clockContainer.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth));
     clockContainer.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
 
     npcRow.appendChild(clockContainer);
@@ -398,18 +391,22 @@ function processChestNpcs() {
         } else {
             chestNpcs[npcId].lastSeen = now;
 
-            if (npcRow.textContent.indexOf('Du musst noch mal von vorn beginnen.') !== -1) {
-                addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
+            var failed = npcRow.textContent.indexOf('Du musst noch mal von vorn beginnen.') !== -1;
+
+            if (failed) {
+                addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'bad');
                 chestNpcs[npcId].position = 0;
                 chestNpcs[npcId].previousPosition = 0;
                 changed = true;
             }
 
             if (chestNpcs[npcId].depth !== depth) {
-                if (chestNpcs[npcId].depth < depth) {
-                    addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'good');
-                } else {
-                    addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
+                if (!failed) {
+                    if (chestNpcs[npcId].depth < depth) {
+                        addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'good');
+                    } else {
+                        addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
+                    }
                 }
 
                 chestNpcs[npcId].depth = depth;
