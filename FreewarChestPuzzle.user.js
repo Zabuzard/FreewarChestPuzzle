@@ -318,8 +318,6 @@ function createMoveFeedback(feedback) {
     container.style.flexDirection = 'column';
     container.style.alignItems = 'flex-start';
     container.style.gap = '0.3em';
-    container.style.marginTop = '3.5em';
-    container.style.marginLeft = '1.6em';
 
     var label = document.createElement('div');
     label.textContent = 'Feedback:';
@@ -383,32 +381,32 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     var clockContainer = document.createElement('div');
     clockContainer.style.display = 'flex';
     clockContainer.style.alignItems = 'flex-start';
+    clockContainer.style.gap = '1em';
 
     var clockColumn = document.createElement('div');
     clockColumn.style.display = 'flex';
     clockColumn.style.flexDirection = 'column';
     clockColumn.style.alignItems = 'center';
 
+    var sideColumn = document.createElement('div');
+    sideColumn.style.display = 'flex';
+    sideColumn.style.flexDirection = 'column';
+    sideColumn.style.alignItems = 'flex-start';
+    sideColumn.style.gap = '1em';
+    sideColumn.style.marginTop = '0.4em';
+
     var depthLabel = document.createElement('div');
     depthLabel.textContent = 'Depth ' + depth;
     depthLabel.style.fontSize = '13px';
     depthLabel.style.fontWeight = 'bold';
-    depthLabel.style.marginTop = '0.4em';
 
-    clockContainer.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
-
-    var feedbackContainer = clockContainer.lastChild;
-
-    clockColumn.appendChild(depthLabel);
     clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth, lastRotation));
 
-    clockContainer.insertBefore(clockColumn, feedbackContainer);
-    clockContainer.style.position = 'relative';
-    feedbackContainer.style.position = 'absolute';
-    feedbackContainer.style.left = '0';
-    feedbackContainer.style.top = '50%';
-    feedbackContainer.style.transform = 'translateY(-50%)';
-    feedbackContainer.style.marginLeft = '0';
+    sideColumn.appendChild(depthLabel);
+    sideColumn.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
+
+    clockContainer.appendChild(clockColumn);
+    clockContainer.appendChild(sideColumn);
 
     npcRow.appendChild(clockContainer);
 }
