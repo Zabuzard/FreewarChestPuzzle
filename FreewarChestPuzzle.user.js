@@ -157,18 +157,18 @@ function addRotationListeners(npcRow, npcId) {
 }
 
 function createPuzzleClock(positions, position, previousPosition, results, depth) {
-    var size = 240;
+    var size = 192;
     var center = size / 2;
-    var radius = 92;
-    var handRadius = 72;
-    var labelRadius = 108;
+    var radius = 74;
+    var handRadius = 58;
+    var labelRadius = 86;
 
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('width', size);
     svg.setAttribute('height', size);
     svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
     svg.style.display = 'block';
-    svg.style.marginTop = '0.5em';
+    svg.style.marginTop = '0.4em';
     svg.style.backgroundColor = '#1e1e1e';
     svg.style.border = '1px solid #444';
     svg.style.borderRadius = '50%';
@@ -228,16 +228,16 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
 
         if (steps === 0) { return; }
 
-        var start = getPoint(from, radius - 15);
-        var end = getPoint(to, radius - 15);
+        var start = getPoint(from, radius - 12);
+        var end = getPoint(to, radius - 12);
         var largeArc = steps > positions / 2 ? 1 : 0;
         var sweep = direction === 1 ? 1 : 0;
 
         var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + (radius - 15) + ' ' + (radius - 15) + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
+        path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + (radius - 12) + ' ' + (radius - 12) + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
         path.setAttribute('fill', 'none');
         path.setAttribute('stroke', '#666');
-        path.setAttribute('stroke-width', '12');
+        path.setAttribute('stroke-width', '10');
         path.setAttribute('stroke-linecap', 'round');
         path.setAttribute('opacity', '0.35');
 
@@ -248,9 +248,9 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
 
     for (var i = 0; i < positions; i++) {
         if (goodPositions.indexOf(i) !== -1) {
-            addCircle(i, 7, '#6f9fc9', '#4f789e');
+            addCircle(i, 5.6, '#6f9fc9', '#4f789e');
         } else if (badPositions.indexOf(i) !== -1) {
-            addCircle(i, 7, '#b56f6f', '#8e4f4f');
+            addCircle(i, 5.6, '#b56f6f', '#8e4f4f');
         }
     }
 
@@ -262,20 +262,20 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         text.setAttribute('y', labelPoint.y);
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('font-size', '13');
+        text.setAttribute('font-size', '10');
         text.setAttribute('fill', '#d0d0d0');
         text.textContent = i;
 
         svg.appendChild(text);
     }
 
-    addHand(previousPosition, 0.25, 5);
-    addHand(position, 0.9, 6);
+    addHand(previousPosition, 0.25, 4);
+    addHand(position, 0.9, 5);
 
     var centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     centerCircle.setAttribute('cx', center);
     centerCircle.setAttribute('cy', center);
-    centerCircle.setAttribute('r', 6);
+    centerCircle.setAttribute('r', 5);
     centerCircle.setAttribute('fill', '#e0e0e0');
 
     svg.appendChild(centerCircle);
@@ -287,23 +287,38 @@ function createMoveFeedback(feedback) {
     var container = document.createElement('div');
 
     container.style.display = 'flex';
-    container.style.alignItems = 'center';
-    container.style.gap = '0.4em';
-    container.style.marginTop = '0.5em';
-    container.style.marginLeft = '0.75em';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'flex-start';
+    container.style.gap = '0.3em';
+    container.style.marginTop = '0.4em';
+    container.style.marginLeft = '1.6em';
+
+    var label = document.createElement('div');
+    label.textContent = 'Feedback:';
+    label.style.fontSize = '13px';
+    label.style.fontWeight = 'bold';
+
+    container.appendChild(label);
+
+    var circles = document.createElement('div');
+    circles.style.display = 'flex';
+    circles.style.alignItems = 'center';
+    circles.style.gap = '0.4em';
 
     for (var i = 0; i < feedback.length; i++) {
         var circle = document.createElement('div');
 
-        circle.style.width = '14px';
-        circle.style.height = '14px';
+        circle.style.width = '34px';
+        circle.style.height = '34px';
         circle.style.borderRadius = '50%';
         circle.style.backgroundColor = feedback[i] === 'Klick' ? '#6f9fc9' : '#b56f6f';
-        circle.style.border = '1px solid ' + (feedback[i] === 'Klick' ? '#4f789e' : '#8e4f4f');
+        circle.style.border = '2px solid ' + (feedback[i] === 'Klick' ? '#4f789e' : '#8e4f4f');
         circle.style.boxSizing = 'border-box';
 
-        container.appendChild(circle);
+        circles.appendChild(circle);
     }
+
+    container.appendChild(circles);
 
     return container;
 }
@@ -315,8 +330,8 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
 
     info.className = 'freewar-chest-puzzle-info';
     info.style.clear = 'both';
-    info.style.marginTop = '0.5em';
-    info.style.padding = '0.25em';
+    info.style.marginTop = '0.4em';
+    info.style.padding = '0.2em';
     info.style.border = '1px solid #999';
     info.style.backgroundColor = '#eee';
     info.style.color = '#000';
@@ -339,9 +354,23 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
 
     var clockContainer = document.createElement('div');
     clockContainer.style.display = 'flex';
-    clockContainer.style.alignItems = 'center';
+    clockContainer.style.alignItems = 'flex-start';
 
-    clockContainer.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth));
+    var clockColumn = document.createElement('div');
+    clockColumn.style.display = 'flex';
+    clockColumn.style.flexDirection = 'column';
+    clockColumn.style.alignItems = 'center';
+
+    var depthLabel = document.createElement('div');
+    depthLabel.textContent = 'Depth ' + depth;
+    depthLabel.style.fontSize = '13px';
+    depthLabel.style.fontWeight = 'bold';
+    depthLabel.style.marginTop = '0.4em';
+
+    clockColumn.appendChild(depthLabel);
+    clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth));
+
+    clockContainer.appendChild(clockColumn);
     clockContainer.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
 
     npcRow.appendChild(clockContainer);
