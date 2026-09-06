@@ -160,7 +160,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
     var size = 192;
     var center = size / 2;
     var radius = 74;
-    var handRadius = 58;
+    var handRadius = 52;
     var labelRadius = 86;
 
     var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -248,9 +248,9 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
 
     for (var i = 0; i < positions; i++) {
         if (goodPositions.indexOf(i) !== -1) {
-            addCircle(i, 5.6, '#6f9fc9', '#4f789e');
+            addCircle(i, 9, '#6f9fc9', '#4f789e');
         } else if (badPositions.indexOf(i) !== -1) {
-            addCircle(i, 5.6, '#b56f6f', '#8e4f4f');
+            addCircle(i, 9, '#b56f6f', '#8e4f4f');
         }
     }
 
@@ -269,8 +269,8 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         svg.appendChild(text);
     }
 
-    addHand(previousPosition, 0.25, 4);
-    addHand(position, 0.9, 5);
+    addHand(previousPosition, 0.25, 3);
+    addHand(position, 0.9, 4);
 
     var centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     centerCircle.setAttribute('cx', center);
