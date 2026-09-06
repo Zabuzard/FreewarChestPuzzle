@@ -58,13 +58,7 @@ function getNpcId(npcRow) {
 }
 
 function isChestNpc(npcRow) {
-    var links = npcRow.getElementsByTagName('a');
-    for (var i = 0; i < links.length; i++) {
-        if (links[i].textContent.trim() === 'Kiste aufbrechen') {
-            return true;
-        }
-    }
-    return false;
+    return npcRow.textContent.indexOf('Kiste aufbrechen') !== -1;
 }
 
 function getDepth(npcRow) {
