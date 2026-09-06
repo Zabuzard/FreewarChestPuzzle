@@ -88,13 +88,45 @@ function getPositions(npcRow) {
     return maxRotation > 0 ? maxRotation * 2 : null;
 }
 
+function addKnownPosition(chestNpc, depth, position, type) {
+    if (!chestNpc.results) {
+        chestNpc.results = {};
+    }
+
+    if (!chestNpc.results[depth]) {
+        chestNpc.results[depth] = {
+            good: [],
+            bad: []
+        };
+    }
+
+    var positions = chestNpc.results[depth][type];
+
+    if (positions.indexOf(position) === -1) {
+        positions.push(position);
+    }
+}
+
 function addRotationListener(link, npcId, rotation) {
     link.addEventListener('click', function() {
         var chestNpcs = loadChestNpcs();
         var chestNpc = chestNpcs[npcId];
         if (!chestNpc || !chestNpc.positions) { return; }
 
-        chestNpc.position = ((chestNpc.position - 1 + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions + 1;
+        var depth = chestNpc.depth;
+        var position = chestNpc.position;
+        var nextDepth = depth;
+
+        if (rotation !== 0) {
+            nextDepth = null;
+        }
+
+        chestNpc.position = ((position - 1 + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions + 1;
+
+        if (nextDepth !== null && nextDepth !== depth) {
+            chestNpc.position = 1;
+        }
+
         saveChestNpcs(chestNpcs);
     });
 }
@@ -112,7 +144,7 @@ function addRotationListeners(npcRow, npcId) {
     }
 }
 
-function displayPuzzleState(npcRow, npcId, depth, positions, position) {
+function displayPuzzleState(npcRow, npcId, depth, positions, position, results) {
     if (npcRow.querySelector('.freewar-chest-puzzle-info')) { return; }
 
     var info = document.createElement('div');
@@ -125,7 +157,20 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position) {
     info.style.backgroundColor = '#eee';
     info.style.color = '#000';
 
-    info.textContent = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Position: ' + position;
+    var text = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Position: ' + position;
+
+    if (results) {
+        var depths = Object.keys(results);
+
+        for (var i = 0; i < depths.length; i++) {
+            var resultDepth = depths[i];
+            var result = results[resultDepth];
+
+            text += ' | Depth ' + resultDepth + ': Good [' + result.good.join(', ') + '] Bad [' + result.bad.join(', ') + ']';
+        }
+    }
+
+    info.textContent = text;
     npcRow.appendChild(info);
 }
 
@@ -154,11 +199,18 @@ function processChestNpcs() {
                 depth: depth,
                 positions: positions,
                 position: 1,
+                results: {},
                 state: 'unknown'
             };
             changed = true;
         } else {
             if (chestNpcs[npcId].depth !== depth) {
+                if (chestNpcs[npcId].depth < depth) {
+                    addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'good');
+                } else {
+                    addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'bad');
+                }
+
                 chestNpcs[npcId].depth = depth;
                 chestNpcs[npcId].position = 1;
                 changed = true;
@@ -173,11 +225,16 @@ function processChestNpcs() {
                 chestNpcs[npcId].position = 1;
                 changed = true;
             }
+
+            if (!chestNpcs[npcId].results) {
+                chestNpcs[npcId].results = {};
+                changed = true;
+            }
         }
 
         if (chestNpcs[npcId].positions !== null) {
             addRotationListeners(npcRow, npcId);
-            displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position);
+            displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position, chestNpcs[npcId].results);
         }
     }
 
