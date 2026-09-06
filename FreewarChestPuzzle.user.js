@@ -472,7 +472,13 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     clockContainer.appendChild(clockColumn);
     clockContainer.appendChild(sideColumn);
 
-    npcRow.appendChild(clockContainer);
+    var timecd = npcRow.querySelector('#timecd');
+
+    if (timecd) {
+        timecd.parentNode.insertBefore(clockContainer, timecd);
+    } else {
+        npcRow.appendChild(clockContainer);
+    }
 }
 
 function processChestNpcs() {
