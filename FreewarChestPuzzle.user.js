@@ -8,6 +8,7 @@
 
 var STORAGE_KEY = 'FreewarChestPuzzle_NPCs';
 var COOKIE_KEY = 'FreewarChestPuzzle_NPCs';
+var STORAGE_MAX_AGE_MS = 24 * 60 * 60 * 1000;
 
 function loadChestNpcs() {
     var value;
@@ -315,6 +316,16 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
 function processChestNpcs() {
     var chestNpcs = loadChestNpcs();
     var changed = false;
+    var now = Date.now();
+
+    for (var storedNpcId in chestNpcs) {
+        if (!Object.prototype.hasOwnProperty.call(chestNpcs, storedNpcId)) { continue; }
+
+        if (chestNpcs[storedNpcId].lastSeen && now - chestNpcs[storedNpcId].lastSeen > STORAGE_MAX_AGE_MS) {
+            delete chestNpcs[storedNpcId];
+            changed = true;
+        }
+    }
 
     var npcRows = document.querySelectorAll('.listusersrow.npcrow');
 
@@ -339,10 +350,13 @@ function processChestNpcs() {
                 position: 0,
                 previousPosition: 0,
                 results: {},
-                state: 'unknown'
+                state: 'unknown',
+                lastSeen: now
             };
             changed = true;
         } else {
+            chestNpcs[npcId].lastSeen = now;
+
             if (npcRow.textContent.indexOf('Du musst noch mal von vorn beginnen.') !== -1) {
                 addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
                 chestNpcs[npcId].position = 0;
