@@ -441,7 +441,13 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     sideColumn.style.marginTop = '0.6em';
 
     var depthLabel = document.createElement('div');
-    depthLabel.textContent = 'Depth ' + depth;
+    var depthPath = [];
+
+    for (var i = 1; i <= depth; i++) {
+        depthPath.push(i);
+    }
+
+    depthLabel.textContent = 'Depth: ' + depthPath.join(' > ');
     depthLabel.style.fontSize = '13px';
     depthLabel.style.fontWeight = '600';
     depthLabel.style.color = '#d4d8de';
