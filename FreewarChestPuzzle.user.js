@@ -290,7 +290,7 @@ function createMoveFeedback(feedback) {
     container.style.flexDirection = 'column';
     container.style.alignItems = 'flex-start';
     container.style.gap = '0.3em';
-    container.style.marginTop = '0.4em';
+    container.style.marginTop = '3.5em';
     container.style.marginLeft = '1.6em';
 
     var label = document.createElement('div');
@@ -367,11 +367,20 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     depthLabel.style.fontWeight = 'bold';
     depthLabel.style.marginTop = '0.4em';
 
+    clockContainer.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
+
+    var feedbackContainer = clockContainer.lastChild;
+
     clockColumn.appendChild(depthLabel);
     clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth));
 
-    clockContainer.appendChild(clockColumn);
-    clockContainer.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
+    clockContainer.insertBefore(clockColumn, feedbackContainer);
+    clockContainer.style.position = 'relative';
+    feedbackContainer.style.position = 'absolute';
+    feedbackContainer.style.left = '0';
+    feedbackContainer.style.top = '50%';
+    feedbackContainer.style.transform = 'translateY(-50%)';
+    feedbackContainer.style.marginLeft = '0';
 
     npcRow.appendChild(clockContainer);
 }
