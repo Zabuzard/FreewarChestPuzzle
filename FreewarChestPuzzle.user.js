@@ -188,7 +188,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
     }
 
     function addCircle(position, radiusValue, fill, stroke) {
-        var point = getPoint(position, radius);
+        var point = getPoint(position, labelRadius);
 
         var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', point.x);
@@ -319,8 +319,14 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('font-size', '10');
-        text.setAttribute('font-weight', '500');
-        text.setAttribute('fill', '#aeb4bd');
+        text.setAttribute('font-weight', '600');
+
+        if (goodPositions.indexOf(i) !== -1 || badPositions.indexOf(i) !== -1) {
+            text.setAttribute('fill', '#ffffff');
+        } else {
+            text.setAttribute('fill', '#aeb4bd');
+        }
+
         text.textContent = i;
 
         svg.appendChild(text);
