@@ -347,6 +347,8 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
 }
 
 function createMoveFeedback(feedback) {
+    if (!feedback.length) { return null; }
+
     var container = document.createElement('div');
 
     container.style.display = 'flex';
@@ -459,7 +461,13 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth, lastRotation));
 
     sideColumn.appendChild(depthLabel);
-    sideColumn.appendChild(createMoveFeedback(getMoveFeedback(npcRow)));
+
+    var feedback = getMoveFeedback(npcRow);
+    var feedbackElement = createMoveFeedback(feedback);
+
+    if (feedbackElement) {
+        sideColumn.appendChild(feedbackElement);
+    }
 
     clockContainer.appendChild(clockColumn);
     clockContainer.appendChild(sideColumn);
