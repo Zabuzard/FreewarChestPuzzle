@@ -504,6 +504,14 @@ function processChestNpcs() {
         var npcId = getNpcId(npcRow);
         if (!npcId) { continue; }
 
+        if (npcRow.textContent.indexOf('Der Deckel der Kiste öffnet sich') !== -1) {
+            if (Object.prototype.hasOwnProperty.call(chestNpcs, npcId)) {
+                delete chestNpcs[npcId];
+                changed = true;
+            }
+            continue;
+        }
+
         var depth = getDepth(npcRow);
         if (depth === null) { continue; }
 
