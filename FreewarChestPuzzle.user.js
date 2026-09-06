@@ -255,7 +255,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('font-size', '12');
         text.setAttribute('font-weight', 'bold');
-        text.setAttribute('fill', '#e0e0e0');
+        text.setAttribute('fill', direction === 1 ? '#f2b880' : '#c6a4d8');
         text.setAttribute('stroke', '#1e1e1e');
         text.setAttribute('stroke-width', '3');
         text.setAttribute('paint-order', 'stroke');
