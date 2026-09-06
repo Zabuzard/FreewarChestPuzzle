@@ -146,6 +146,140 @@ function addRotationListeners(npcRow, npcId) {
     }
 }
 
+function createPuzzleClock(positions, position, previousPosition, results) {
+    var size = 240;
+    var center = size / 2;
+    var radius = 92;
+    var handRadius = 72;
+    var labelRadius = 108;
+
+    var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', size);
+    svg.setAttribute('height', size);
+    svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
+    svg.style.display = 'block';
+    svg.style.marginTop = '0.5em';
+
+    var currentResult = results && results[position];
+    var goodPositions = results && results.good ? results.good : [];
+    var badPositions = results && results.bad ? results.bad : [];
+
+    if (results) {
+        var depthResults = results[Object.keys(results).find(function(key) {
+            return results[key] && results[key].good && results[key].bad;
+        })];
+        if (depthResults) {
+            goodPositions = depthResults.good || [];
+            badPositions = depthResults.bad || [];
+        }
+    }
+
+    function getPoint(position, distance) {
+        var angle = position / positions * Math.PI * 2 - Math.PI / 2;
+        return {
+            x: center + Math.cos(angle) * distance,
+            y: center + Math.sin(angle) * distance
+        };
+    }
+
+    function addCircle(position, radiusValue, fill, stroke) {
+        var point = getPoint(position, radius);
+
+        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', point.x);
+        circle.setAttribute('cy', point.y);
+        circle.setAttribute('r', radiusValue);
+        circle.setAttribute('fill', fill);
+
+        if (stroke) {
+            circle.setAttribute('stroke', stroke);
+            circle.setAttribute('stroke-width', '1');
+        }
+
+        svg.appendChild(circle);
+    }
+
+    function addHand(position, opacity, width) {
+        var point = getPoint(position, handRadius);
+
+        var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', center);
+        line.setAttribute('y1', center);
+        line.setAttribute('x2', point.x);
+        line.setAttribute('y2', point.y);
+        line.setAttribute('stroke', '#333');
+        line.setAttribute('stroke-width', width);
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('opacity', opacity);
+
+        svg.appendChild(line);
+    }
+
+    function addArc(from, to) {
+        if (from === to) { return; }
+
+        var clockwise = ((to - from + positions) % positions);
+        var counterClockwise = positions - clockwise;
+        var direction = clockwise <= counterClockwise ? 1 : -1;
+        var steps = direction === 1 ? clockwise : counterClockwise;
+
+        if (steps === 0) { return; }
+
+        var start = getPoint(from, radius - 15);
+        var end = getPoint(to, radius - 15);
+        var largeArc = steps > positions / 2 ? 1 : 0;
+        var sweep = direction === 1 ? 1 : 0;
+
+        var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + (radius - 15) + ' ' + (radius - 15) + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', '#b8b8b8');
+        path.setAttribute('stroke-width', '12');
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('opacity', '0.35');
+
+        svg.appendChild(path);
+    }
+
+    addArc(previousPosition, position);
+
+    for (var i = 0; i < positions; i++) {
+        if (goodPositions.indexOf(i) !== -1) {
+            addCircle(i, 7, '#a9ccef', '#7faed8');
+        } else if (badPositions.indexOf(i) !== -1) {
+            addCircle(i, 7, '#efb0b0', '#d98c8c');
+        }
+    }
+
+    for (var i = 0; i < positions; i++) {
+        var labelPoint = getPoint(i, labelRadius);
+
+        var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', labelPoint.x);
+        text.setAttribute('y', labelPoint.y);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-size', '13');
+        text.setAttribute('fill', '#333');
+        text.textContent = i;
+
+        svg.appendChild(text);
+    }
+
+    addHand(previousPosition, 0.25, 5);
+    addHand(position, 0.9, 6);
+
+    var centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    centerCircle.setAttribute('cx', center);
+    centerCircle.setAttribute('cy', center);
+    centerCircle.setAttribute('r', 6);
+    centerCircle.setAttribute('fill', '#333');
+
+    svg.appendChild(centerCircle);
+
+    return svg;
+}
+
 function displayPuzzleState(npcRow, npcId, depth, positions, position, previousPosition, results) {
     if (npcRow.querySelector('.freewar-chest-puzzle-info')) { return; }
 
@@ -174,6 +308,8 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
 
     info.textContent = text;
     npcRow.appendChild(info);
+
+    npcRow.appendChild(createPuzzleClock(positions, position, previousPosition, results));
 }
 
 function processChestNpcs() {
