@@ -160,6 +160,9 @@ function createPuzzleClock(positions, position, previousPosition, results) {
     svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
     svg.style.display = 'block';
     svg.style.marginTop = '0.5em';
+    svg.style.backgroundColor = '#1e1e1e';
+    svg.style.border = '1px solid #444';
+    svg.style.borderRadius = '50%';
 
     var currentResult = results && results[position];
     var goodPositions = results && results.good ? results.good : [];
@@ -208,7 +211,7 @@ function createPuzzleClock(positions, position, previousPosition, results) {
         line.setAttribute('y1', center);
         line.setAttribute('x2', point.x);
         line.setAttribute('y2', point.y);
-        line.setAttribute('stroke', '#333');
+        line.setAttribute('stroke', '#e0e0e0');
         line.setAttribute('stroke-width', width);
         line.setAttribute('stroke-linecap', 'round');
         line.setAttribute('opacity', opacity);
@@ -234,7 +237,7 @@ function createPuzzleClock(positions, position, previousPosition, results) {
         var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + (radius - 15) + ' ' + (radius - 15) + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
         path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', '#b8b8b8');
+        path.setAttribute('stroke', '#666');
         path.setAttribute('stroke-width', '12');
         path.setAttribute('stroke-linecap', 'round');
         path.setAttribute('opacity', '0.35');
@@ -246,9 +249,9 @@ function createPuzzleClock(positions, position, previousPosition, results) {
 
     for (var i = 0; i < positions; i++) {
         if (goodPositions.indexOf(i) !== -1) {
-            addCircle(i, 7, '#a9ccef', '#7faed8');
+            addCircle(i, 7, '#6f9fc9', '#4f789e');
         } else if (badPositions.indexOf(i) !== -1) {
-            addCircle(i, 7, '#efb0b0', '#d98c8c');
+            addCircle(i, 7, '#b56f6f', '#8e4f4f');
         }
     }
 
@@ -261,7 +264,7 @@ function createPuzzleClock(positions, position, previousPosition, results) {
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('font-size', '13');
-        text.setAttribute('fill', '#333');
+        text.setAttribute('fill', '#d0d0d0');
         text.textContent = i;
 
         svg.appendChild(text);
@@ -274,7 +277,7 @@ function createPuzzleClock(positions, position, previousPosition, results) {
     centerCircle.setAttribute('cx', center);
     centerCircle.setAttribute('cy', center);
     centerCircle.setAttribute('r', 6);
-    centerCircle.setAttribute('fill', '#333');
+    centerCircle.setAttribute('fill', '#e0e0e0');
 
     svg.appendChild(centerCircle);
 
