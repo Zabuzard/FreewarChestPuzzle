@@ -418,9 +418,11 @@ function processChestNpcs() {
                 changed = true;
             }
 
-            if (chestNpcs[npcId].positions === null && positions !== null) {
-                chestNpcs[npcId].positions = positions;
-                changed = true;
+            if (chestNpcs[npcId].positions === undefined || chestNpcs[npcId].positions === null) {
+                if (positions !== null) {
+                    chestNpcs[npcId].positions = positions;
+                    changed = true;
+                }
             }
 
             if (chestNpcs[npcId].position === undefined || chestNpcs[npcId].position === null) {
@@ -439,7 +441,7 @@ function processChestNpcs() {
             }
         }
 
-        if (chestNpcs[npcId].positions !== null) {
+        if (chestNpcs[npcId].positions !== null && chestNpcs[npcId].positions !== undefined) {
             addRotationListeners(npcRow, npcId);
             displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position, chestNpcs[npcId].previousPosition, chestNpcs[npcId].results);
         }
