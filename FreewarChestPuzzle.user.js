@@ -270,6 +270,33 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         text.textContent = steps + (direction === 1 ? 'R' : 'L');
 
         svg.appendChild(text);
+
+        var arrowPosition = from + direction * (steps - 0.6);
+        arrowPosition = ((arrowPosition % positions) + positions) % positions;
+
+        var arrowPoint = getPoint(arrowPosition, arcRadius);
+        var arrowAngle = arrowPosition / positions * Math.PI * 2 - Math.PI / 2;
+        var tangentAngle = arrowAngle + (direction === 1 ? Math.PI / 2 : -Math.PI / 2);
+        var arrowSize = 8;
+
+        var arrowLeft = {
+            x: arrowPoint.x - Math.cos(tangentAngle - 0.5) * arrowSize,
+            y: arrowPoint.y - Math.sin(tangentAngle - 0.5) * arrowSize
+        };
+
+        var arrowRight = {
+            x: arrowPoint.x - Math.cos(tangentAngle + 0.5) * arrowSize,
+            y: arrowPoint.y - Math.sin(tangentAngle + 0.5) * arrowSize
+        };
+
+        var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        arrow.setAttribute('d', 'M ' + arrowPoint.x + ' ' + arrowPoint.y + ' L ' + arrowLeft.x + ' ' + arrowLeft.y + ' L ' + arrowRight.x + ' ' + arrowRight.y + ' Z');
+        arrow.setAttribute('fill', direction === 1 ? '#f2b880' : '#c6a4d8');
+        arrow.setAttribute('stroke', '#1e1e1e');
+        arrow.setAttribute('stroke-width', '2');
+        arrow.setAttribute('paint-order', 'stroke');
+
+        svg.appendChild(arrow);
     }
 
     addArc(previousPosition, position);
