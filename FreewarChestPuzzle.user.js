@@ -228,13 +228,14 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
 
         if (steps === 0) { return; }
 
-        var start = getPoint(from, radius - 12);
-        var end = getPoint(to, radius - 12);
+        var arcRadius = radius - 12;
+        var start = getPoint(from, arcRadius);
+        var end = getPoint(to, arcRadius);
         var largeArc = steps > positions / 2 ? 1 : 0;
         var sweep = direction === 1 ? 1 : 0;
 
         var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + (radius - 12) + ' ' + (radius - 12) + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
+        path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + arcRadius + ' ' + arcRadius + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
         path.setAttribute('fill', 'none');
         path.setAttribute('stroke', '#666');
         path.setAttribute('stroke-width', '10');
@@ -242,6 +243,25 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         path.setAttribute('opacity', '0.35');
 
         svg.appendChild(path);
+
+        var middlePosition = from + direction * (steps / 2);
+        middlePosition = ((middlePosition % positions) + positions) % positions;
+        var labelPoint = getPoint(middlePosition, arcRadius - 20);
+
+        var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', labelPoint.x);
+        text.setAttribute('y', labelPoint.y);
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-size', '12');
+        text.setAttribute('font-weight', 'bold');
+        text.setAttribute('fill', '#e0e0e0');
+        text.setAttribute('stroke', '#1e1e1e');
+        text.setAttribute('stroke-width', '3');
+        text.setAttribute('paint-order', 'stroke');
+        text.textContent = steps + (direction === 1 ? 'R' : 'L');
+
+        svg.appendChild(text);
     }
 
     addArc(previousPosition, position);
