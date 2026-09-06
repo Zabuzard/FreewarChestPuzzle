@@ -207,6 +207,13 @@ function processChestNpcs() {
             };
             changed = true;
         } else {
+            if (npcRow.textContent.indexOf('Du musst noch mal von vorn beginnen.') !== -1) {
+                addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
+                chestNpcs[npcId].position = 1;
+                chestNpcs[npcId].previousPosition = 1;
+                changed = true;
+            }
+
             if (chestNpcs[npcId].depth !== depth) {
                 if (chestNpcs[npcId].depth < depth) {
                     addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'good');
