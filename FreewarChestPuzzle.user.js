@@ -115,6 +115,7 @@ function addRotationListener(link, npcId, rotation) {
 
         var depth = chestNpc.depth;
         var position = chestNpc.position;
+        var previousPosition = chestNpc.position;
         var nextDepth = depth;
 
         if (rotation !== 0) {
@@ -122,6 +123,7 @@ function addRotationListener(link, npcId, rotation) {
         }
 
         chestNpc.position = ((position - 1 + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions + 1;
+        chestNpc.previousPosition = previousPosition;
 
         if (nextDepth !== null && nextDepth !== depth) {
             chestNpc.position = 1;
@@ -144,7 +146,7 @@ function addRotationListeners(npcRow, npcId) {
     }
 }
 
-function displayPuzzleState(npcRow, npcId, depth, positions, position, results) {
+function displayPuzzleState(npcRow, npcId, depth, positions, position, previousPosition, results) {
     if (npcRow.querySelector('.freewar-chest-puzzle-info')) { return; }
 
     var info = document.createElement('div');
@@ -157,7 +159,7 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, results) 
     info.style.backgroundColor = '#eee';
     info.style.color = '#000';
 
-    var text = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Position: ' + position;
+    var text = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Previous Position: ' + previousPosition + ' | Position: ' + position;
 
     if (results) {
         var depths = Object.keys(results);
@@ -199,6 +201,7 @@ function processChestNpcs() {
                 depth: depth,
                 positions: positions,
                 position: 1,
+                previousPosition: 1,
                 results: {},
                 state: 'unknown'
             };
@@ -208,11 +211,12 @@ function processChestNpcs() {
                 if (chestNpcs[npcId].depth < depth) {
                     addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'good');
                 } else {
-                    addKnownPosition(chestNpcs[npcId], chestNpcs[npcId].depth, chestNpcs[npcId].position, 'bad');
+                    addKnownPosition(chestNpcs[npcId], depth, chestNpcs[npcId].position, 'bad');
                 }
 
                 chestNpcs[npcId].depth = depth;
                 chestNpcs[npcId].position = 1;
+                chestNpcs[npcId].previousPosition = 1;
                 changed = true;
             }
 
@@ -226,6 +230,11 @@ function processChestNpcs() {
                 changed = true;
             }
 
+            if (!chestNpcs[npcId].previousPosition) {
+                chestNpcs[npcId].previousPosition = 1;
+                changed = true;
+            }
+
             if (!chestNpcs[npcId].results) {
                 chestNpcs[npcId].results = {};
                 changed = true;
@@ -234,7 +243,7 @@ function processChestNpcs() {
 
         if (chestNpcs[npcId].positions !== null) {
             addRotationListeners(npcRow, npcId);
-            displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position, chestNpcs[npcId].results);
+            displayPuzzleState(npcRow, npcId, depth, chestNpcs[npcId].positions, chestNpcs[npcId].position, chestNpcs[npcId].previousPosition, chestNpcs[npcId].results);
         }
     }
 
