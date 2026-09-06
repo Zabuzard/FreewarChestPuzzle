@@ -170,9 +170,10 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
     svg.setAttribute('viewBox', '0 0 ' + size + ' ' + size);
     svg.style.display = 'block';
     svg.style.marginTop = '0.4em';
-    svg.style.backgroundColor = '#1e1e1e';
-    svg.style.border = '1px solid #444';
+    svg.style.backgroundColor = '#17191d';
+    svg.style.border = '1px solid #3a3f47';
     svg.style.borderRadius = '50%';
+    svg.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.35)';
 
     var depthResults = results && results[depth];
     var goodPositions = depthResults ? depthResults.good || [] : [];
@@ -211,7 +212,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         line.setAttribute('y1', center);
         line.setAttribute('x2', point.x);
         line.setAttribute('y2', point.y);
-        line.setAttribute('stroke', '#e0e0e0');
+        line.setAttribute('stroke', '#e5e7eb');
         line.setAttribute('stroke-width', width);
         line.setAttribute('stroke-linecap', 'round');
         line.setAttribute('opacity', opacity);
@@ -245,10 +246,10 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         path.setAttribute('d', 'M ' + start.x + ' ' + start.y + ' A ' + arcRadius + ' ' + arcRadius + ' 0 ' + largeArc + ' ' + sweep + ' ' + end.x + ' ' + end.y);
         path.setAttribute('fill', 'none');
-        path.setAttribute('stroke', '#666');
-        path.setAttribute('stroke-width', '10');
+        path.setAttribute('stroke', '#818892');
+        path.setAttribute('stroke-width', '9');
         path.setAttribute('stroke-linecap', 'round');
-        path.setAttribute('opacity', '0.35');
+        path.setAttribute('opacity', '0.3');
 
         svg.appendChild(path);
 
@@ -264,7 +265,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         text.setAttribute('font-size', '12');
         text.setAttribute('font-weight', 'bold');
         text.style.setProperty('fill', direction === 1 ? '#f2b880' : '#c6a4d8', 'important');
-        text.setAttribute('stroke', '#1e1e1e');
+        text.setAttribute('stroke', '#17191d');
         text.setAttribute('stroke-width', '3');
         text.setAttribute('paint-order', 'stroke');
         text.textContent = steps + (direction === 1 ? 'R' : 'L');
@@ -292,7 +293,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         var arrow = document.createElementNS('http://www.w3.org/2000/svg', 'path');
         arrow.setAttribute('d', 'M ' + arrowPoint.x + ' ' + arrowPoint.y + ' L ' + arrowLeft.x + ' ' + arrowLeft.y + ' L ' + arrowRight.x + ' ' + arrowRight.y + ' Z');
         arrow.setAttribute('fill', direction === 1 ? '#f2b880' : '#c6a4d8');
-        arrow.setAttribute('stroke', '#1e1e1e');
+        arrow.setAttribute('stroke', '#17191d');
         arrow.setAttribute('stroke-width', '2');
         arrow.setAttribute('paint-order', 'stroke');
 
@@ -318,7 +319,8 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('font-size', '10');
-        text.setAttribute('fill', '#d0d0d0');
+        text.setAttribute('font-weight', '500');
+        text.setAttribute('fill', '#aeb4bd');
         text.textContent = i;
 
         svg.appendChild(text);
@@ -331,7 +333,7 @@ function createPuzzleClock(positions, position, previousPosition, results, depth
     centerCircle.setAttribute('cx', center);
     centerCircle.setAttribute('cy', center);
     centerCircle.setAttribute('r', 5);
-    centerCircle.setAttribute('fill', '#e0e0e0');
+    centerCircle.setAttribute('fill', '#f1f3f5');
 
     svg.appendChild(centerCircle);
 
@@ -344,29 +346,37 @@ function createMoveFeedback(feedback) {
     container.style.display = 'flex';
     container.style.flexDirection = 'column';
     container.style.alignItems = 'flex-start';
-    container.style.gap = '0.3em';
+    container.style.gap = '0.4em';
+    container.style.padding = '0.65em 0.8em';
+    container.style.backgroundColor = '#202329';
+    container.style.border = '1px solid #353a42';
+    container.style.borderRadius = '10px';
+    container.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.2)';
 
     var label = document.createElement('div');
-    label.textContent = 'Feedback:';
-    label.style.fontSize = '13px';
-    label.style.fontWeight = 'bold';
+    label.textContent = 'Feedback';
+    label.style.fontSize = '12px';
+    label.style.fontWeight = '600';
+    label.style.color = '#b8bec8';
+    label.style.letterSpacing = '0.02em';
 
     container.appendChild(label);
 
     var circles = document.createElement('div');
     circles.style.display = 'flex';
     circles.style.alignItems = 'center';
-    circles.style.gap = '0.4em';
+    circles.style.gap = '0.35em';
 
     for (var i = 0; i < feedback.length; i++) {
         var circle = document.createElement('div');
 
-        circle.style.width = '34px';
-        circle.style.height = '34px';
+        circle.style.width = '32px';
+        circle.style.height = '32px';
         circle.style.borderRadius = '50%';
         circle.style.backgroundColor = feedback[i] === 'Klick' ? '#6f9fc9' : '#b56f6f';
         circle.style.border = '2px solid ' + (feedback[i] === 'Klick' ? '#4f789e' : '#8e4f4f');
         circle.style.boxSizing = 'border-box';
+        circle.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.25)';
 
         circles.appendChild(circle);
     }
@@ -383,11 +393,12 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
 
     info.className = 'freewar-chest-puzzle-info';
     info.style.clear = 'both';
-    info.style.marginTop = '0.4em';
-    info.style.padding = '0.2em';
-    info.style.border = '1px solid #999';
-    info.style.backgroundColor = '#eee';
-    info.style.color = '#000';
+    info.style.marginTop = '0.5em';
+    info.style.padding = '0.45em 0.6em';
+    info.style.border = '1px solid #353a42';
+    info.style.backgroundColor = '#202329';
+    info.style.color = '#aeb4bd';
+    info.style.borderRadius = '8px';
 
     // var text = 'Chest-NPC ID: ' + npcId + ' | Depth: ' + depth + ' | Positions: ' + positions + ' | Previous Position: ' + previousPosition + ' | Position: ' + position;
 
@@ -409,6 +420,7 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     clockContainer.style.display = 'flex';
     clockContainer.style.alignItems = 'flex-start';
     clockContainer.style.gap = '1em';
+    clockContainer.style.padding = '0.25em 0';
 
     var clockColumn = document.createElement('div');
     clockColumn.style.display = 'flex';
@@ -419,13 +431,18 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     sideColumn.style.display = 'flex';
     sideColumn.style.flexDirection = 'column';
     sideColumn.style.alignItems = 'flex-start';
-    sideColumn.style.gap = '1em';
-    sideColumn.style.marginTop = '0.4em';
+    sideColumn.style.gap = '0.8em';
+    sideColumn.style.marginTop = '0.6em';
 
     var depthLabel = document.createElement('div');
     depthLabel.textContent = 'Depth ' + depth;
     depthLabel.style.fontSize = '13px';
-    depthLabel.style.fontWeight = 'bold';
+    depthLabel.style.fontWeight = '600';
+    depthLabel.style.color = '#d4d8de';
+    depthLabel.style.padding = '0.4em 0.7em';
+    depthLabel.style.backgroundColor = '#202329';
+    depthLabel.style.border = '1px solid #353a42';
+    depthLabel.style.borderRadius = '7px';
 
     clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth, lastRotation));
 
