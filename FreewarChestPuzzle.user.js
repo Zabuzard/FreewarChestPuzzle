@@ -132,6 +132,10 @@ function addRotationListener(link, npcId, rotation) {
             nextDepth = null;
         }
 
+        chestNpc.undoPosition = chestNpc.position;
+        chestNpc.undoPreviousPosition = chestNpc.previousPosition;
+        chestNpc.undoLastRotation = chestNpc.lastRotation;
+
         chestNpc.position = ((position + rotation) % chestNpc.positions + chestNpc.positions) % chestNpc.positions;
         chestNpc.previousPosition = previousPosition;
         chestNpc.lastRotation = rotation;
@@ -394,6 +398,73 @@ function createMoveFeedback(feedback) {
     return container;
 }
 
+function createUndoButton(npcId) {
+    var button = document.createElement('button');
+
+    button.type = 'button';
+    button.title = 'Fehler im Skript? Letze Aktion rückgängig machen';
+    button.style.width = '30px';
+    button.style.height = '30px';
+    button.style.padding = '0';
+    button.style.display = 'flex';
+    button.style.alignItems = 'center';
+    button.style.justifyContent = 'center';
+    button.style.color = '#d4d8de';
+    button.style.backgroundColor = '#202329';
+    button.style.border = '1px solid #353a42';
+    button.style.borderRadius = '7px';
+    button.style.cursor = 'pointer';
+    button.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
+
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('width', '18');
+    icon.setAttribute('height', '18');
+    icon.setAttribute('viewBox', '0 0 24 24');
+    icon.setAttribute('fill', 'none');
+
+    var iconPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    iconPath.setAttribute('d', 'M9 7H4V2');
+    iconPath.setAttribute('stroke', '#d4d8de');
+    iconPath.setAttribute('stroke-width', '2');
+    iconPath.setAttribute('stroke-linecap', 'round');
+    iconPath.setAttribute('stroke-linejoin', 'round');
+
+    icon.appendChild(iconPath);
+
+    var iconArc = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    iconArc.setAttribute('d', 'M4 7a8 8 0 1 1 2.3 7.1');
+    iconArc.setAttribute('stroke', '#d4d8de');
+    iconArc.setAttribute('stroke-width', '2');
+    iconArc.setAttribute('stroke-linecap', 'round');
+    iconArc.setAttribute('fill', 'none');
+
+    icon.appendChild(iconArc);
+    button.appendChild(icon);
+
+    button.addEventListener('click', function() {
+        var chestNpcs = loadChestNpcs();
+        var chestNpc = chestNpcs[npcId];
+
+        if (!chestNpc || chestNpc.undoPosition === undefined || chestNpc.undoPreviousPosition === undefined) {
+            return;
+        }
+
+        chestNpc.position = chestNpc.undoPosition;
+        chestNpc.previousPosition = chestNpc.undoPreviousPosition;
+        chestNpc.lastRotation = chestNpc.undoLastRotation;
+
+        delete chestNpc.undoPosition;
+        delete chestNpc.undoPreviousPosition;
+        delete chestNpc.undoLastRotation;
+
+        saveChestNpcs(chestNpcs);
+
+        processChestNpcs();
+    });
+
+    return button;
+}
+
 function displayPuzzleState(npcRow, npcId, depth, positions, position, previousPosition, results, lastRotation) {
     if (npcRow.querySelector('.freewar-chest-puzzle-info')) { return; }
 
@@ -442,6 +513,13 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     sideColumn.style.gap = '0.8em';
     sideColumn.style.marginTop = '0.6em';
 
+    var depthRow = document.createElement('div');
+    depthRow.style.display = 'flex';
+    depthRow.style.alignItems = 'center';
+    depthRow.style.gap = '0.5em';
+
+    var undoButton = createUndoButton(npcId);
+
     var depthLabel = document.createElement('div');
     var depthPath = [];
 
@@ -449,7 +527,7 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
         depthPath.push(i);
     }
 
-    depthLabel.textContent = 'Depth: ' + depthPath.join(' > ');
+    depthLabel.textContent = 'Tiefe: ' + depthPath.join(' > ');
     depthLabel.style.fontSize = '13px';
     depthLabel.style.fontWeight = '600';
     depthLabel.style.color = '#d4d8de';
@@ -458,9 +536,12 @@ function displayPuzzleState(npcRow, npcId, depth, positions, position, previousP
     depthLabel.style.border = '1px solid #353a42';
     depthLabel.style.borderRadius = '7px';
 
+    depthRow.appendChild(undoButton);
+    depthRow.appendChild(depthLabel);
+
     clockColumn.appendChild(createPuzzleClock(positions, position, previousPosition, results, depth, lastRotation));
 
-    sideColumn.appendChild(depthLabel);
+    sideColumn.appendChild(depthRow);
 
     var feedback = getMoveFeedback(npcRow);
     var feedbackElement = createMoveFeedback(feedback);
@@ -526,8 +607,10 @@ function processChestNpcs() {
                 position: 0,
                 previousPosition: 0,
                 lastRotation: 0,
+                undoPosition: undefined,
+                undoPreviousPosition: undefined,
+                undoLastRotation: undefined,
                 results: {},
-                state: 'unknown',
                 lastSeen: now
             };
             changed = true;
